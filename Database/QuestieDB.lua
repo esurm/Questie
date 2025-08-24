@@ -243,17 +243,6 @@ function QuestieDB:Initialize()
         preferredIndex = 3
     }
 
-    -- Force database recompilation to include Epoch data
-    if not Questie.db.global.epochDataCompiled then
-        print("Questie: Epoch database changes detected, forcing recompilation...")
-        if Questie.IsSoD then
-            Questie.db.global.sod.dbIsCompiled = false
-        else
-            Questie.db.global.dbIsCompiled = false
-        end
-        Questie.db.global.epochDataCompiled = true
-    end
-
     -- For now we store both, the SoD database and the Era/HC database
     local npcBin, npcPtrs, questBin, questPtrs, objBin, objPtrs, itemBin, itemPtrs
     if Questie.IsSoD then

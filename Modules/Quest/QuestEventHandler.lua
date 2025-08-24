@@ -214,8 +214,7 @@ end
 ---@param questId number
 function _QuestEventHandler:QuestAccepted(questLogIndex, questId)
     questId = questId or select(8, GetQuestLogTitle(questLogIndex))
-    print("*** QUESTIE DEBUG: QuestAccepted function called for quest " .. tostring(questId) .. " ***")
-    Questie:Debug(Questie.DEBUG_CRITICAL, "[QuestAccepted] *** QUEST ACCEPTED FUNCTION CALLED ***", questLogIndex, questId)
+    Questie:Debug(Questie.DEBUG_DEVELOP, "[QuestAccepted] *** QUEST ACCEPTED FUNCTION CALLED ***", questLogIndex, questId)
     Questie:Debug(Questie.DEBUG_DEVELOP, "[Quest Event] QUEST_ACCEPTED", questLogIndex, questId)
 
     if questLog[questId] and questLog[questId].timer then
@@ -232,25 +231,26 @@ function _QuestEventHandler:QuestAccepted(questLogIndex, questId)
 
     -- Check if this is a quest not in the database and create a runtime stub IMMEDIATELY (synchronously)
     -- This must happen before any tracker updates to prevent "Unknown Zone" flash
-    print("*** QUESTIE DEBUG: Checking if quest " .. tostring(questId) .. " needs runtime stub ***")
-    Questie:Debug(Questie.DEBUG_CRITICAL, "[QuestAccepted] Checking if quest", questId, "needs runtime stub...")
+    if Questie.db.profile.debugEnabled then
+        Questie:Debug(Questie.DEBUG_DEVELOP, "[QuestAccepted] Checking if quest", questId, "needs runtime stub...")
+    end
     local isInDatabase = QuestieDB.QuestPointers[questId] ~= nil
-    print("*** QUESTIE DEBUG: Quest " .. tostring(questId) .. " is in database: " .. tostring(isInDatabase) .. " ***")
-    Questie:Debug(Questie.DEBUG_CRITICAL, "[QuestAccepted] Quest", questId, "is in database:", isInDatabase)
+    if Questie.db.profile.debugEnabled then
+        Questie:Debug(Questie.DEBUG_DEVELOP, "[QuestAccepted] Quest", questId, "is in database:", isInDatabase)
+    end
     
     if not isInDatabase then
-        print("*** QUESTIE DEBUG: Creating runtime stub for unknown quest " .. tostring(questId) .. " ***")
-        Questie:Debug(Questie.DEBUG_CRITICAL, "[QuestAccepted] Creating runtime stub IMMEDIATELY for unknown quest:", questId)
+        if Questie.db.profile.debugEnabled then
+            Questie:Debug(Questie.DEBUG_DEVELOP, "[QuestAccepted] Creating runtime stub IMMEDIATELY for unknown quest:", questId)
+        end
         -- Create stub immediately using the questLogIndex we have right now
         local title, level, questTag, suggestedGroup, isHeader, isCollapsed, isComplete, isDaily, questIdFromLog = GetQuestLogTitle(questLogIndex)
-        print("*** QUESTIE DEBUG: GetQuestLogTitle results - title: " .. tostring(title) .. " level: " .. tostring(level) .. " questTag: " .. tostring(questTag) .. " ***")
-        print("*** QUESTIE DEBUG: Additional metadata - suggestedGroup: " .. tostring(suggestedGroup) .. " isDaily: " .. tostring(isDaily) .. " isComplete: " .. tostring(isComplete) .. " ***")
-        print("*** QUESTIE DEBUG: Raw parameters - isHeader: " .. tostring(isHeader) .. " isCollapsed: " .. tostring(isCollapsed) .. " questIdFromLog: " .. tostring(questIdFromLog) .. " ***")
-        Questie:Debug(Questie.DEBUG_CRITICAL, "[QuestAccepted] GetQuestLogTitle results:")
-        Questie:Debug(Questie.DEBUG_CRITICAL, "  title:", title, "level:", level, "questTag:", questTag)
-        Questie:Debug(Questie.DEBUG_CRITICAL, "  suggestedGroup:", suggestedGroup, "isDaily:", isDaily, "isComplete:", isComplete)
-        Questie:Debug(Questie.DEBUG_CRITICAL, "  questId:", questIdFromLog, "target questId:", questId)
-        print("*** QUESTIE DEBUG: questIdFromLog = " .. tostring(questIdFromLog) .. ", target questId = " .. tostring(questId) .. ", title = " .. tostring(title) .. " ***")
+        if Questie.db.profile.debugEnabled then
+            Questie:Debug(Questie.DEBUG_DEVELOP, "[QuestAccepted] GetQuestLogTitle results:")
+            Questie:Debug(Questie.DEBUG_DEVELOP, "  title:", title, "level:", level, "questTag:", questTag)
+            Questie:Debug(Questie.DEBUG_DEVELOP, "  suggestedGroup:", suggestedGroup, "isDaily:", isDaily, "isComplete:", isComplete)
+            Questie:Debug(Questie.DEBUG_DEVELOP, "  questId:", questIdFromLog, "target questId:", questId)
+        end
         
         if title then  -- Only require title, questIdFromLog is often nil immediately after quest acceptance
             -- We have valid quest data, create a minimal stub with zone info right away
@@ -355,27 +355,37 @@ function _QuestEventHandler:QuestAccepted(questLogIndex, questId)
                 __isRuntimeStub = true,
             }
             
-            Questie:Debug(Questie.DEBUG_INFO, "[QuestAccepted] Created stub with metadata:")
-            Questie:Debug(Questie.DEBUG_CRITICAL, "  Level:", actualQuestLevel, "questTag:", questTypeTag, "questType:", questType)
-            Questie:Debug(Questie.DEBUG_CRITICAL, "  suggestedGroup:", suggestedGroup, "isDaily:", isDaily, "isRepeatable:", immediateStub.IsRepeatable)
+            if Questie.db.profile.debugEnabled then
+                Questie:Debug(Questie.DEBUG_DEVELOP, "[QuestAccepted] Created stub with metadata:")
+                Questie:Debug(Questie.DEBUG_DEVELOP, "  Level:", actualQuestLevel, "questTag:", questTypeTag, "questType:", questType)
+                Questie:Debug(Questie.DEBUG_DEVELOP, "  suggestedGroup:", suggestedGroup, "isDaily:", isDaily, "isRepeatable:", immediateStub.IsRepeatable)
+            end
             
             QuestiePlayer.currentQuestlog = QuestiePlayer.currentQuestlog or {}
             QuestiePlayer.currentQuestlog[questId] = immediateStub
-            print("*** QUESTIE DEBUG: Immediate runtime stub created with zone: " .. tostring(currentZoneName or "Unknown Zone") .. " ***")
-            Questie:Debug(Questie.DEBUG_CRITICAL, "[QuestAccepted] Immediate runtime stub created with zone:", currentZoneName or "Unknown Zone")
+            if Questie.db.profile.debugEnabled then
+                Questie:Debug(Questie.DEBUG_DEVELOP, "[QuestAccepted] Immediate runtime stub created with zone:", currentZoneName or "Unknown Zone")
+            end
         else
-            print("*** QUESTIE DEBUG: Could not get quest data for immediate stub creation ***")
-            Questie:Debug(Questie.DEBUG_CRITICAL, "[QuestAccepted] Could not get quest data for immediate stub creation")
+            if Questie.db.profile.debugEnabled then
+                Questie:Debug(Questie.DEBUG_DEVELOP, "[QuestAccepted] Could not get quest data for immediate stub creation")
+            end
         end
     else
         -- Database quest - handle it with direct tracker integration for foolproof reliability
-        print("*** QUESTIE DEBUG: Database quest " .. tostring(questId) .. " - ensuring immediate tracker integration ***")
-        Questie:Debug(Questie.DEBUG_CRITICAL, "[QuestAccepted] Database quest detected - using direct tracker integration")
+        if Questie.db.profile.debugEnabled then
+            Questie:Debug(Questie.DEBUG_DEVELOP, "[QuestAccepted] Database quest - immediate tracker integration")
+        end
+        if Questie.db.profile.debugEnabled then
+            Questie:Debug(Questie.DEBUG_DEVELOP, "[QuestAccepted] Database quest detected - using direct tracker integration")
+        end
         
         -- Force immediate tracker update for database quests to ensure reliability
         -- This bypasses all cache comparison logic that can fail with rapid quest acceptance
         QuestieCombatQueue:Queue(function()
-            print("*** QUESTIE DEBUG: Executing direct tracker update for database quest " .. tostring(questId) .. " ***")
+            if Questie.db.profile.debugEnabled then
+                Questie:Debug(Questie.DEBUG_DEVELOP, "[QuestAccepted] Direct tracker update for database quest:", questId)
+            end
             QuestieTracker:Update()
         end)
     end
@@ -392,11 +402,15 @@ function _QuestEventHandler:QuestAccepted(questLogIndex, questId)
         if not questInDatabase then
             -- Runtime stub - skip QUEST_LOG_UPDATE since we'll force a full scan
             skipNextUQLCEvent = true
-            print("*** QUESTIE DEBUG: Skipping QUEST_LOG_UPDATE for runtime stub quest " .. tostring(questId) .. " ***")
+            if Questie.db.profile.debugEnabled then
+                Questie:Debug(Questie.DEBUG_DEVELOP, "[QuestAccepted] Skipping QUEST_LOG_UPDATE for runtime stub:", questId)
+            end
         else
             -- Database quest - skip QUEST_LOG_UPDATE since we're using direct tracker integration
             skipNextUQLCEvent = true
-            print("*** QUESTIE DEBUG: Skipping QUEST_LOG_UPDATE for database quest " .. tostring(questId) .. " (using direct integration) ***")
+            if Questie.db.profile.debugEnabled then
+                Questie:Debug(Questie.DEBUG_DEVELOP, "[QuestAccepted] Skipping QUEST_LOG_UPDATE for database quest (direct integration):", questId)
+            end
         end
     end
 
@@ -804,8 +818,7 @@ end
 ---@param event string
 function _QuestEventHandler:OnEvent(event, ...)
     if event == "QUEST_ACCEPTED" then
-        print("*** QUESTIE DEBUG: QUEST_ACCEPTED EVENT FIRED ***")
-        Questie:Debug(Questie.DEBUG_CRITICAL, "[OnEvent] *** QUEST_ACCEPTED EVENT FIRED ***", ...)
+        Questie:Debug(Questie.DEBUG_DEVELOP, "[OnEvent] *** QUEST_ACCEPTED EVENT FIRED ***", ...)
         _QuestEventHandler:QuestAccepted(...)
     elseif event == "QUEST_TURNED_IN" then
         _QuestEventHandler:QuestTurnedIn(...)
