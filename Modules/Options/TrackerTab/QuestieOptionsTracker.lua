@@ -641,6 +641,19 @@ function QuestieOptions.tabs.tracker:Initialize()
                                     QuestieTracker:UpdateFormatting()
                                 end
                             },
+                            hideZoneHeaders = {
+                                type = "toggle",
+                                order = 2.5,
+                                width = 1.5,
+                                name = function() return l10n("Hide Zone Headers") end,
+                                desc = function() return l10n("When enabled, zone headers like 'Trade District', '[Epoch]', and 'Quests (By Level)' will be hidden, showing only quest titles and objectives in a flat list.") end,
+                                disabled = function() return not Questie.db.profile.trackerEnabled end,
+                                get = function() return Questie.db.profile.trackerHideZoneHeaders end,
+                                set = function(_, value)
+                                    Questie.db.profile.trackerHideZoneHeaders = value
+                                    QuestieTracker:Update()
+                                end
+                            },
                             alwaysShowTracker = {
                                 type = "toggle",
                                 order = 3,

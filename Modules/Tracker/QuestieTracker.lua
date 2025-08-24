@@ -638,26 +638,31 @@ function QuestieTracker:Update()
                 end
 
                 if firstQuestInZone then
-                    -- Get first line in linePool
-                    line = TrackerLinePool.GetNextLine()
+                    -- Skip creating zone headers if user has disabled them
+                    if Questie.db.profile.trackerHideZoneHeaders then
+                        -- Don't create zone header, just mark that we've handled this zone
+                        firstQuestInZone = false
+                    else
+                        -- Get first line in linePool
+                        line = TrackerLinePool.GetNextLine()
 
-                    -- Safety check - make sure we didn't run over our linePool limit.
-                    if not line then break end
+                        -- Safety check - make sure we didn't run over our linePool limit.
+                        if not line then break end
 
-                    -- Set Line Mode, Types, Clickers
-                    line:SetMode("zone")
-                    line:SetZone(zoneName)
-                    line.expandQuest:Hide()
-                    line.criteriaMark:Hide()
-                    line.playButton:Hide()
+                        -- Set Line Mode, Types, Clickers
+                        line:SetMode("zone")
+                        line:SetZone(zoneName)
+                        line.expandQuest:Hide()
+                        line.criteriaMark:Hide()
+                        line.playButton:Hide()
 
-                    -- Setup Zone Label
-                    line.label:ClearAllPoints()
-                    line.label:SetPoint("TOPLEFT", line, "TOPLEFT", 0, 0)
+                        -- Setup Zone Label
+                        line.label:ClearAllPoints()
+                        line.label:SetPoint("TOPLEFT", line, "TOPLEFT", 0, 0)
 
-                    -- Set Zone Title and default Min/Max states
-                    if Questie.db.char.collapsedZones[zoneName] then
-                        line.expandZone:SetMode(0)
+                        -- Set Zone Title and default Min/Max states
+                        if Questie.db.char.collapsedZones[zoneName] then
+                            line.expandZone:SetMode(0)
                         line.label:SetText("|cFFC0C0C0" .. l10n(zoneName) .. " +|r")
                     else
                         line.expandZone:SetMode(1)
@@ -705,6 +710,7 @@ function QuestieTracker:Update()
                     line.Objective = nil
                     firstQuestInZone = false
                     zoneCheck = zoneName
+                    end -- Close the else block for zone header creation
                 end
 
                 -- Add quest
@@ -1088,8 +1094,14 @@ function QuestieTracker:Update()
                                     local objDesc = objective.Description:gsub("%.", "")
 
                                     if (objective.Completed ~= true or (objective.Completed == true and #quest.Objectives > 1)) then
-                                        -- Use objective description exactly as it appears in quest log
-                                        line.label:SetText(QuestieLib:GetRGBForObjective(objective) .. objDesc)
+                                        -- Format objective text with progress numbers like achievements do
+                                        if objective.Needed and objective.Needed > 1 and objective.Collected ~= nil then
+                                            local progressText = ": " .. (objective.Collected or 0) .. "/" .. objective.Needed
+                                            line.label:SetText(QuestieLib:GetRGBForObjective(objective) .. objDesc .. progressText)
+                                        else
+                                            -- Use objective description for single-count objectives or when no progress data
+                                            line.label:SetText(QuestieLib:GetRGBForObjective(objective) .. objDesc)
+                                        end
 
                                         -- Check and measure Objective text and update tracker width
                                         QuestieTracker:UpdateWidth(line.label:GetUnboundedStringWidth() + lineLabelWidthQBC)
@@ -1274,24 +1286,29 @@ function QuestieTracker:Update()
                     end
 
                     if firstAchieveInZone then
-                        -- Get first line in linePool
-                        line = TrackerLinePool.GetNextLine()
+                        -- Skip creating zone headers if user has disabled them
+                        if Questie.db.profile.trackerHideZoneHeaders then
+                            -- Don't create zone header, just mark that we've handled this zone
+                            firstAchieveInZone = false
+                        else
+                            -- Get first line in linePool
+                            line = TrackerLinePool.GetNextLine()
 
-                        -- Safety check - make sure we didn't run over our linePool limit.
-                        if not line then break end
+                            -- Safety check - make sure we didn't run over our linePool limit.
+                            if not line then break end
 
-                        -- Set Line Mode, Types, Clickers
-                        line:SetMode("zone")
-                        line:SetZone(zoneName)
-                        line.expandQuest:Hide()
-                        line.criteriaMark:Hide()
-                        line.playButton:Hide()
+                            -- Set Line Mode, Types, Clickers
+                            line:SetMode("zone")
+                            line:SetZone(zoneName)
+                            line.expandQuest:Hide()
+                            line.criteriaMark:Hide()
+                            line.playButton:Hide()
 
-                        -- Setup Zone Label
-                        line.label:ClearAllPoints()
-                        line.label:SetPoint("TOPLEFT", line, "TOPLEFT", 0, 0)
+                            -- Setup Zone Label
+                            line.label:ClearAllPoints()
+                            line.label:SetPoint("TOPLEFT", line, "TOPLEFT", 0, 0)
 
-                        -- Set Zone Title and Min/Max states
+                            -- Set Zone Title and Min/Max states
                         if Questie.db.char.collapsedZones[zoneName] then
                             line.expandZone:SetMode(0)
                             local text = zoneName == "Achievements" and l10n("Achievements") or zoneName
@@ -1343,6 +1360,7 @@ function QuestieTracker:Update()
                         line.Objective = nil
                         firstAchieveInZone = false
                         zoneCheck = zoneName
+                        end
                     end
 
                     -- Add Achievements

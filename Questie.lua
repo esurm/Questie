@@ -17,9 +17,6 @@ local QuestieValidateGameCache = QuestieLoader:ImportModule("QuestieValidateGame
 local QuestieLib = QuestieLoader:ImportModule("QuestieLib");
 
 function Questie:OnInitialize()
-    -- EpogQuestie: Debug initialization
-    print("|cFF00FF00[EpogQuestie]|r OnInitialize called")
-    
     -- This has to happen OnInitialize to be available asap
     Questie.db = LibStub("AceDB-3.0"):New("QuestieConfig", QuestieOptionsDefaults:Load(), true)
 
@@ -32,9 +29,6 @@ function Questie:OnInitialize()
 end
 
 function Questie:OnEnable()
-    -- EpogQuestie: Debug enable
-    print("|cFF00FF00[EpogQuestie]|r OnEnable called")
-    
     if Questie.IsWotlk or QuestieCompat.Is335 then
         -- Called when the addon is enabled
         if (Questie.db.profile.trackerEnabled and not Questie.db.profile.showBlizzardQuestTimer) then

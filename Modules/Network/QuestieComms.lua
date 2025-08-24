@@ -796,7 +796,15 @@ function QuestieComms:CreateQuestDataPacket(questId)
                     req = objective.numRequired,
                 }
             else
-                Questie:Error(l10n("Missing objective data for quest "), tostring(questId), " ", tostring(objectiveIndex))
+                Questie:Debug(Questie.DEBUG_DEVELOP, l10n("Missing objective data for quest "), tostring(questId), " ", tostring(objectiveIndex), " - creating fallback communication data")
+                -- Create fallback communication data for database quests
+                quest.objectives[objectiveIndex] = {
+                    id = objectiveIndex, -- Use objectiveIndex as fallback ID
+                    typ = string.sub(objective.type, 1, 1),
+                    fin = objective.finished,
+                    ful = objective.numFulfilled,
+                    req = objective.numRequired,
+                }
             end
         end
     end

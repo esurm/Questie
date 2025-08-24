@@ -1761,7 +1761,23 @@ function QuestieQuest:PopulateQuestLogInfo(quest)
     for objectiveIndex, objective in pairs(questObjectives) do
         if objective.type and string.len(objective.type) > 1 then
             if (not quest.ObjectiveData) or (not quest.ObjectiveData[objectiveIndex]) then
-                Questie:Error(l10n("Missing objective data for quest "), quest.Id, " ", objective.text)
+                Questie:Debug(Questie.DEBUG_DEVELOP, l10n("Missing objective data for quest "), quest.Id, " ", objective.text, " - creating fallback objective")
+                -- Create fallback objective for database quests or quests missing ObjectiveData
+                if not quest.Objectives[objectiveIndex] then
+                    quest.Objectives[objectiveIndex] = {
+                        Id = objectiveIndex, -- Use objectiveIndex as fallback ID
+                        Index = objectiveIndex,
+                        questId = quest.Id,
+                        _lastUpdate = 0,
+                        Description = objective.text,
+                        spawnList = {},
+                        AlreadySpawned = {},
+                        Update = _QuestieQuest.ObjectiveUpdate,
+                        Coordinates = nil, -- No coordinates for fallback objectives
+                        RequiredRepValue = nil
+                    }
+                end
+                quest.Objectives[objectiveIndex]:Update()
             else
                 if not quest.Objectives[objectiveIndex] then
                     quest.Objectives[objectiveIndex] = {

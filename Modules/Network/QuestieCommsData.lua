@@ -58,13 +58,8 @@ function QuestieComms.data:GetTooltip(tooltipKey)
                         if(itemName) then
                             oName = itemName;
                         else
-                            oName = "Item missing from DB, fetching from server!";
-                            local item = Item:CreateFromItemID(objective.id)
-                            item:ContinueOnItemLoad(function()
-                                local name = item:GetItemName();
-                                oName = name;
-                                tooltipData[questId][playerName][objectiveIndex].text = name;
-                            end)
+                            oName = "Item missing from DB and server cache";
+                            -- Note: Item data not available immediately, fallback to generic text
                         end
                     end
                 end

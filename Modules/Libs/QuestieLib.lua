@@ -12,6 +12,7 @@ local l10n = QuestieLoader:ImportModule("l10n")
 
 --- COMPATIBILITY ---
 local addonName = QuestieCompat.Is335 and QuestieCompat.addonName or "Questie"
+local GetItemInfo = QuestieCompat.GetItemInfo
 
 QuestieLib.AddonPath = "Interface\\Addons\\"..addonName.."\\"
 
@@ -409,18 +410,19 @@ function QuestieLib:CacheItemNames(questId)
             if objectiveDB.Type == "item" then
                 if not ((QuestieDB.ItemPointers or QuestieDB.itemData)[objectiveDB.Id]) then
                     Questie:Debug(Questie.DEBUG_DEVELOP, "[QuestieLib:CacheItemNames] Requesting item information for missing itemId:", objectiveDB.Id)
-                    local item = Item:CreateFromItemID(objectiveDB.Id)
-                    item:ContinueOnItemLoad(
-                        function()
-                            local itemName = item:GetItemName()
-                            if not QuestieDB.itemDataOverrides[objectiveDB.Id] then
-                                QuestieDB.itemDataOverrides[objectiveDB.Id] = { itemName, { questId }, {}, {} }
-                            else
-                                QuestieDB.itemDataOverrides[objectiveDB.Id][1] = itemName
-                            end
-                            Questie:Debug(Questie.DEBUG_DEVELOP,
-                                "[QuestieLib:CacheItemNames] Created item information for item:", itemName, ":", objectiveDB.Id)
-                        end)
+                    
+                    -- Use GetItemInfo instead of Item:CreateFromItemID for compatibility
+                    local itemName = GetItemInfo(objectiveDB.Id)
+                    if itemName then
+                        if not QuestieDB.itemDataOverrides[objectiveDB.Id] then
+                            QuestieDB.itemDataOverrides[objectiveDB.Id] = { itemName, { questId }, {}, {} }
+                        else
+                            QuestieDB.itemDataOverrides[objectiveDB.Id][1] = itemName
+                        end
+                        Questie:Debug(Questie.DEBUG_DEVELOP, "[QuestieLib:CacheItemNames] Cached item name for", objectiveDB.Id, ":", itemName)
+                    else
+                        Questie:Debug(Questie.DEBUG_DEVELOP, "[QuestieLib:CacheItemNames] Could not get item name for", objectiveDB.Id)
+                    end
                 end
             end
         end

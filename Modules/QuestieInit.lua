@@ -463,7 +463,7 @@ function QuestieInit:Init()
         return
     end
     -- EpogQuestie: Debug init start
-    print("|cFF00FF00[EpogQuestie]|r QuestieInit:Init called")
+    print("|cFF00FF00[EpogQuestie]|r Github: https://github.com/esurm/Questie")
     
     ThreadLib.ThreadError(_QuestieInit.StartStageCoroutine, Questie.db.profile.initDelay or 0, l10n("Error during initialization!"))
 

@@ -1719,10 +1719,15 @@ function QuestieDB.GetQuestIDFromName(name, questgiverGUID, questStarter)
                     end
                 end
             elseif Questie.IsSoD == false then -- don't print these errors in SoD, as we expect missing data when new quests release; debug offers will handle these scenarios instead
-                Questie:Error("Database mismatch! No entries found that match quest name. Please report this on Github or Discord!")
-                Questie:Error("Queststarter is: " .. unit_type .. " " .. questgiverID)
-                Questie:Error("Quest name is: " .. name)
-                Questie:Error("Client info is: " .. GetBuildInfo() .. "; " .. QuestieLib:GetAddonVersionString())
+                -- Suppressed database mismatch errors for custom servers like Ascension Epoch
+                -- These are expected when custom quests aren't in the database
+                Questie:Debug(Questie.DEBUG_DEVELOP, "Database mismatch for quest starter - custom quest not in database")
+                Questie:Debug(Questie.DEBUG_DEVELOP, "Queststarter is: " .. unit_type .. " " .. questgiverID)
+                Questie:Debug(Questie.DEBUG_DEVELOP, "Quest name is: " .. name)
+                -- Questie:Error("Database mismatch! No entries found that match quest name. Please report this on Github or Discord!")
+                -- Questie:Error("Queststarter is: " .. unit_type .. " " .. questgiverID)
+                -- Questie:Error("Quest name is: " .. name)
+                -- Questie:Error("Client info is: " .. GetBuildInfo() .. "; " .. QuestieLib:GetAddonVersionString())
             end
         else
             if questsEnded then
@@ -1732,10 +1737,15 @@ function QuestieDB.GetQuestIDFromName(name, questgiverGUID, questStarter)
                     end
                 end
             elseif Questie.IsSoD == false then -- don't print these errors in SoD, as we expect missing data when new quests release; debug offers will handle these scenarios instead
-                Questie:Error("Database mismatch! No entries found that match quest name. Please report this on Github or Discord!")
-                Questie:Error("Questender is: " .. unit_type .. " " .. questgiverID)
-                Questie:Error("Quest name is: " .. name)
-                Questie:Error("Client info is: " .. GetBuildInfo() .. "; " .. QuestieLib:GetAddonVersionString())
+                -- Suppressed database mismatch errors for custom servers like Ascension Epoch
+                -- These are expected when custom quests aren't in the database
+                Questie:Debug(Questie.DEBUG_DEVELOP, "Database mismatch for quest ender - custom quest not in database")
+                Questie:Debug(Questie.DEBUG_DEVELOP, "Questender is: " .. unit_type .. " " .. questgiverID)
+                Questie:Debug(Questie.DEBUG_DEVELOP, "Quest name is: " .. name)
+                -- Questie:Error("Database mismatch! No entries found that match quest name. Please report this on Github or Discord!")
+                -- Questie:Error("Questender is: " .. unit_type .. " " .. questgiverID)
+                -- Questie:Error("Quest name is: " .. name)
+                -- Questie:Error("Client info is: " .. GetBuildInfo() .. "; " .. QuestieLib:GetAddonVersionString())
             end
         end
     end
