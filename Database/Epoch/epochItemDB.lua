@@ -8,6 +8,7 @@ local epochItemData = {
 [3625] = {"Nek'rosh's Head",{45262},nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,{26999}},
 [6252] = {"[Epoch] Item 6252",{4677},nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,{27256}},
 [8684] = {"Hinterlands Honey Ripple",nil,{142191}},
+[33085] = {"Bloodfen Feather",{4356,4357},nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,{11158}},
 [33849] = {"Mana Berry",nil,{4000005},nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,{26768}},
 [60015] = {"Mana Tainted Sludge",nil,{4000006}},
 [60018] = {"Mine Spider Mandible",{43},nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,{26774}},

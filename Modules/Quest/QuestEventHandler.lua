@@ -245,6 +245,13 @@ function _QuestEventHandler:QuestAccepted(questLogIndex, questId)
         end
         -- Create stub immediately using the questLogIndex we have right now
         local title, level, questTag, suggestedGroup, isHeader, isCollapsed, isComplete, isDaily, questIdFromLog = GetQuestLogTitle(questLogIndex)
+        
+        -- Warn the user about missing quest
+        if title then
+            Questie:Print("|cFFFF0000[Missing Quest]|r Quest '" .. title .. "' (ID: " .. questId .. ") is not in the Questie database. Please report this on GitHub.")
+        else
+            Questie:Print("|cFFFF0000[Missing Quest]|r Quest ID " .. questId .. " is not in the Questie database. Please report this on GitHub.")
+        end
         if Questie.db.profile.debugEnabled then
             Questie:Debug(Questie.DEBUG_DEVELOP, "[QuestAccepted] GetQuestLogTitle results:")
             Questie:Debug(Questie.DEBUG_DEVELOP, "  title:", title, "level:", level, "questTag:", questTag)

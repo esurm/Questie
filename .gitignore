@@ -1,0 +1,20 @@
+# Development and documentation files
+*.md
+!README.md
+!CHANGELOG.md
+
+# Test files
+*_test.lua
+*_additions.lua
+QuestInfo.lua
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
