@@ -1,5 +1,9 @@
 # Questie Changelog
 
+## [1.3.4b] - 2025-08-25
+
+- Bugfixes
+
 ## [1.3.4] - 2025-08-25
 
 ### Added
