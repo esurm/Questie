@@ -374,20 +374,8 @@ function _QuestEventHandler:QuestAccepted(questLogIndex, questId)
     else
         -- Database quest - handle it with direct tracker integration for foolproof reliability
         if Questie.db.profile.debugEnabled then
-            Questie:Debug(Questie.DEBUG_DEVELOP, "[QuestAccepted] Database quest - immediate tracker integration")
-        end
-        if Questie.db.profile.debugEnabled then
             Questie:Debug(Questie.DEBUG_DEVELOP, "[QuestAccepted] Database quest detected - using direct tracker integration")
         end
-        
-        -- Force immediate tracker update for database quests to ensure reliability
-        -- This bypasses all cache comparison logic that can fail with rapid quest acceptance
-        QuestieCombatQueue:Queue(function()
-            if Questie.db.profile.debugEnabled then
-                Questie:Debug(Questie.DEBUG_DEVELOP, "[QuestAccepted] Direct tracker update for database quest:", questId)
-            end
-            QuestieTracker:Update()
-        end)
     end
 
     -- Timed quests do not need a full Quest Log Update.
@@ -397,7 +385,7 @@ function _QuestEventHandler:QuestAccepted(questLogIndex, questId)
         skipNextUQLCEvent = false
     else
         -- Only skip QUEST_LOG_UPDATE for runtime stubs
-        -- Database quests now use direct tracker integration, so we can skip their QUEST_LOG_UPDATE too
+        -- For database quests, allow fallback QUEST_LOG_UPDATE processing to handle rapid acceptance edge cases
         local questInDatabase = QuestieDB.QuestPointers[questId] ~= nil
         if not questInDatabase then
             -- Runtime stub - skip QUEST_LOG_UPDATE since we'll force a full scan
@@ -406,10 +394,10 @@ function _QuestEventHandler:QuestAccepted(questLogIndex, questId)
                 Questie:Debug(Questie.DEBUG_DEVELOP, "[QuestAccepted] Skipping QUEST_LOG_UPDATE for runtime stub:", questId)
             end
         else
-            -- Database quest - skip QUEST_LOG_UPDATE since we're using direct tracker integration
-            skipNextUQLCEvent = true
+            -- Database quest - allow QUEST_LOG_UPDATE as fallback for rapid acceptance reliability
+            skipNextUQLCEvent = false
             if Questie.db.profile.debugEnabled then
-                Questie:Debug(Questie.DEBUG_DEVELOP, "[QuestAccepted] Skipping QUEST_LOG_UPDATE for database quest (direct integration):", questId)
+                Questie:Debug(Questie.DEBUG_DEVELOP, "[QuestAccepted] Allowing QUEST_LOG_UPDATE fallback for database quest:", questId)
             end
         end
     end
@@ -485,10 +473,6 @@ function _QuestEventHandler:HandleQuestAccepted(questId)
         end
     else
         Questie:Debug(Questie.DEBUG_INFO, "[HandleQuestAccepted] Quest", questId, "is already in database, no runtime stub needed")
-        -- For database quests, also trigger immediate tracker update to handle rapid quest acceptance
-        QuestieCombatQueue:Queue(function()
-            QuestieTracker:Update()
-        end)
     end
 
     QuestieJourney:AcceptQuest(questId)
@@ -499,7 +483,7 @@ function _QuestEventHandler:HandleQuestAccepted(questId)
         QuestieQuest:SmoothReset()
     else
         QuestieQuest:AcceptQuest(questId)
-        -- Immediate tracker update for database quests to handle rapid acceptance
+        -- Single tracker update for all quest types to avoid redundancy
         QuestieCombatQueue:Queue(function()
             QuestieTracker:Update()
         end)

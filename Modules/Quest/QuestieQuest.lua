@@ -325,7 +325,7 @@ function QuestieQuest:UpdateRuntimeStubs()
         -- Update tracker if we made changes
         if removed > 0 then
             QuestieCombatQueue:Queue(function()
-                QuestieTracker:Update()
+                QuestieTracker:Update(true) -- Force update when removing abandoned runtime stubs
             end)
         end
     end

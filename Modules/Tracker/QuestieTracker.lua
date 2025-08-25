@@ -2027,6 +2027,12 @@ function QuestieTracker:HookBaseTracker()
 end
 
 function QuestieTracker:RemoveQuest(questId)
+    -- Guard against being called before database initialization
+    if not Questie.db or not Questie.db.char then
+        Questie:Debug(Questie.DEBUG_DEVELOP, "[QuestieTracker:RemoveQuest] Called before DB initialization, skipping:", questId)
+        return
+    end
+    
     Questie:Debug(Questie.DEBUG_DEVELOP, "[QuestieTracker:RemoveQuest] - ", questId)
     if Questie.db.char.collapsedQuests then
         Questie.db.char.collapsedQuests[questId] = nil
