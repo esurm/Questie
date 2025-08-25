@@ -2039,9 +2039,9 @@ function QuestieTracker:RemoveQuest(questId)
     end
 
     -- Let's remove the Quest from the Tracker tables just in case...
-    if Questie.db.char.AutoUntrackedQuests[questId] then
+    if Questie.db.char.AutoUntrackedQuests and Questie.db.char.AutoUntrackedQuests[questId] then
         Questie.db.char.AutoUntrackedQuests[questId] = nil
-    elseif Questie.db.char.TrackedQuests[questId] then
+    elseif Questie.db.char.TrackedQuests and Questie.db.char.TrackedQuests[questId] then
         Questie.db.char.TrackedQuests[questId] = nil
     end
 

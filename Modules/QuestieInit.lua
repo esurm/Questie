@@ -299,6 +299,10 @@ QuestieInit.Stages[3] = function() -- run as a coroutine
     end
     -- ** OLD ** Questie:ContinueInit() ** END **
 
+    -- Initialize the tracker BEFORE registering quest events
+    coYield()
+    QuestieTracker.Initialize()
+    
     coYield()
     QuestEventHandler:RegisterEvents()
     coYield()
@@ -315,10 +319,6 @@ QuestieInit.Stages[3] = function() -- run as a coroutine
     Townsfolk.PostBoot()
     coYield()
     QuestieQuest:GetAllQuestIds()
-
-    -- Initialize the tracker
-    coYield()
-    QuestieTracker.Initialize()
     Hooks:HookQuestLogTitle()
     QuestieCombatQueue.Initialize()
 
