@@ -196,6 +196,8 @@ function QuestieOptionsDefaults:Load()
             },
             journey = {},
             isTrackerExpanded = true,
+            AutoUntrackedQuests = {},
+            TrackedQuests = {},
         },
         global = {
             -- TBC Isle of Quel'Danas
