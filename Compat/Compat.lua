@@ -841,6 +841,9 @@ function QuestieCompat.GetContainerItemInfo(bagID, slot)
 	    end
 
 	    return iconFile, stackCount, isLocked, quality, isReadable, hasLoot, hyperlink, false, false, tonumber(itemID), false
+    else
+        -- Return nil values in the expected format when no hyperlink (item not loaded yet)
+        return nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil
     end
 end
 

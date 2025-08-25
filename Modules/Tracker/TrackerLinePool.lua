@@ -496,27 +496,30 @@ function TrackerLinePool.Initialize(questFrame)
             for bag = -2, 4 do
                 for slot = 1, QuestieCompat.GetContainerNumSlots(bag) do
                     local texture, _, _, _, _, _, _, _, _, itemId = QuestieCompat.GetContainerItemInfo(bag, slot)
-                    -- These type of quest items can never be secondary buttons
-                    if quest.sourceItemId == itemId and QuestieDB.QueryItemSingle(itemId, "class") == 12 and buttonType == "primary" then
-                        validTexture = texture
-                        self.itemId = quest.sourceItemId
-                        break
-                    end
-                    -- These type of quest items are technically secondary buttons but are assigned primary button slots
-                    if (not quest.sourceItemId or quest.sourceItemId == 0) and type(quest.requiredSourceItems) == "table" and #quest.requiredSourceItems == 1 then
-                        local questItemId = quest.requiredSourceItems[1]
-                        if questItemId and questItemId ~= quest.sourceItemId and QuestieDB.QueryItemSingle(questItemId, "class") == 12 and questItemId == itemId then
+                    -- Skip if item is not loaded yet or no texture/itemId
+                    if texture and itemId then
+                        -- These type of quest items can never be secondary buttons
+                        if quest.sourceItemId == itemId and QuestieDB.QueryItemSingle(itemId, "class") == 12 and buttonType == "primary" then
                             validTexture = texture
-                            self.itemId = questItemId
+                            self.itemId = quest.sourceItemId
                             break
                         end
-                        -- These type of quest items can never be primary buttons
-                    elseif type(quest.requiredSourceItems) == "table" and #quest.requiredSourceItems > 1 then
-                        for _, questItemId in pairs(quest.requiredSourceItems) do
-                            if questItemId and questItemId ~= quest.sourceItemId and QuestieDB.QueryItemSingle(questItemId, "class") == 12 and questItemId == itemId and buttonType == "secondary" then
+                        -- These type of quest items are technically secondary buttons but are assigned primary button slots
+                        if (not quest.sourceItemId or quest.sourceItemId == 0) and type(quest.requiredSourceItems) == "table" and #quest.requiredSourceItems == 1 then
+                            local questItemId = quest.requiredSourceItems[1]
+                            if questItemId and questItemId ~= quest.sourceItemId and QuestieDB.QueryItemSingle(questItemId, "class") == 12 and questItemId == itemId then
                                 validTexture = texture
                                 self.itemId = questItemId
                                 break
+                            end
+                            -- These type of quest items can never be primary buttons
+                        elseif type(quest.requiredSourceItems) == "table" and #quest.requiredSourceItems > 1 then
+                            for _, questItemId in pairs(quest.requiredSourceItems) do
+                                if questItemId and questItemId ~= quest.sourceItemId and QuestieDB.QueryItemSingle(questItemId, "class") == 12 and questItemId == itemId and buttonType == "secondary" then
+                                    validTexture = texture
+                                    self.itemId = questItemId
+                                    break
+                                end
                             end
                         end
                     end

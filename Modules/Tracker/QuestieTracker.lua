@@ -630,8 +630,7 @@ function QuestieTracker:Update()
 
             if (complete ~= 1 or Questie.db.profile.trackerShowCompleteQuests or timedQuest)
                 and ((Questie.db.profile.autoTrackQuests and not Questie.db.char.AutoUntrackedQuests[questId])
-                or (not Questie.db.profile.autoTrackQuests and Questie.db.char.TrackedQuests[questId])
-                or (quest.__isRuntimeStub)) then
+                or (not Questie.db.profile.autoTrackQuests and Questie.db.char.TrackedQuests[questId])) then
                 -- Add Quest Zones
                 if zoneCheck ~= zoneName then
                     firstQuestInZone = true
@@ -1094,13 +1093,20 @@ function QuestieTracker:Update()
                                     local objDesc = objective.Description:gsub("%.", "")
 
                                     if (objective.Completed ~= true or (objective.Completed == true and #quest.Objectives > 1)) then
-                                        -- Format objective text with progress numbers like achievements do
-                                        if objective.Needed and objective.Needed > 1 and objective.Collected ~= nil then
-                                            local progressText = ": " .. (objective.Collected or 0) .. "/" .. objective.Needed
-                                            line.label:SetText(QuestieLib:GetRGBForObjective(objective) .. objDesc .. progressText)
-                                        else
-                                            -- Use objective description for single-count objectives or when no progress data
+                                        -- For runtime stub quests, use objective description as-is from the quest log API
+                                        -- For database quests, add progress formatting if needed
+                                        if quest.__isRuntimeStub then
+                                            -- Stub quests already have properly formatted descriptions from the quest log API
                                             line.label:SetText(QuestieLib:GetRGBForObjective(objective) .. objDesc)
+                                        else
+                                            -- Database quests need progress formatting added by the tracker
+                                            if objective.Needed and objective.Needed > 1 and objective.Collected ~= nil then
+                                                local progressText = ": " .. (objective.Collected or 0) .. "/" .. objective.Needed
+                                                line.label:SetText(QuestieLib:GetRGBForObjective(objective) .. objDesc .. progressText)
+                                            else
+                                                -- Use objective description for single-count objectives or when no progress data
+                                                line.label:SetText(QuestieLib:GetRGBForObjective(objective) .. objDesc)
+                                            end
                                         end
 
                                         -- Check and measure Objective text and update tracker width
@@ -2207,13 +2213,6 @@ function QuestieTracker:AQW_Insert(index, expire)
                     -- Store the stub
                     QuestiePlayer.currentQuestlog[questId] = quest
                     Questie:Debug(Questie.DEBUG_INFO, "[QuestieTracker:AQW_Insert] Created runtime stub for quest", questId, "with name:", quest.name)
-                    
-                    -- Ensure it gets tracked
-                    if Questie.db.profile.autoTrackQuests then
-                        Questie.db.char.AutoUntrackedQuests[questId] = nil
-                    else
-                        Questie.db.char.TrackedQuests[questId] = true
-                    end
                 else
                     Questie:Debug(Questie.DEBUG_INFO, "[QuestieTracker:AQW_Insert] Cannot create stub - invalid title or is header for quest", questId)
                 end

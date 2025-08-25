@@ -485,6 +485,10 @@ function _QuestEventHandler:HandleQuestAccepted(questId)
         end
     else
         Questie:Debug(Questie.DEBUG_INFO, "[HandleQuestAccepted] Quest", questId, "is already in database, no runtime stub needed")
+        -- For database quests, also trigger immediate tracker update to handle rapid quest acceptance
+        QuestieCombatQueue:Queue(function()
+            QuestieTracker:Update()
+        end)
     end
 
     QuestieJourney:AcceptQuest(questId)
@@ -495,6 +499,10 @@ function _QuestEventHandler:HandleQuestAccepted(questId)
         QuestieQuest:SmoothReset()
     else
         QuestieQuest:AcceptQuest(questId)
+        -- Immediate tracker update for database quests to handle rapid acceptance
+        QuestieCombatQueue:Queue(function()
+            QuestieTracker:Update()
+        end)
     end
 
     return true

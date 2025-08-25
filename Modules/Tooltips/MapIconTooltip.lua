@@ -586,8 +586,31 @@ function _MapIconTooltip:GetObjectiveTooltip(icon)
                 end
                 if playerColor then
                     local objectiveEntry = objectiveData[iconData.ObjectiveIndex]
+                    
+                    -- If direct index doesn't work, try alternative indexing
                     if not objectiveEntry then
-                        Questie:Debug(Questie.DEBUG_DEVELOP, "[_MapIconTooltip:GetObjectiveTooltip] No objective data for quest", quest.Id)
+                        -- Try 1-based indexing if 0-based didn't work
+                        local altIndex = iconData.ObjectiveIndex + 1
+                        if objectiveData[altIndex] then
+                            objectiveEntry = objectiveData[altIndex]
+                        else
+                            -- Try 0-based indexing if 1-based didn't work
+                            altIndex = iconData.ObjectiveIndex - 1
+                            if altIndex >= 0 and objectiveData[altIndex] then
+                                objectiveEntry = objectiveData[altIndex]
+                            else
+                                -- Search through objectives to find matching one by index field
+                                for _, objData in pairs(objectiveData) do
+                                    if type(objData) == "table" and objData.index == iconData.ObjectiveIndex then
+                                        objectiveEntry = objData
+                                        break
+                                    end
+                                end
+                            end
+                        end
+                    end
+                    
+                    if not objectiveEntry then
                         objectiveEntry = {} -- This will make "GetRGBForObjective" return default color
                     end
                     local remoteColor = QuestieLib:GetRGBForObjective(objectiveEntry)

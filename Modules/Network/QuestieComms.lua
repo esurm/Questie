@@ -26,6 +26,7 @@ local C_Timer = QuestieCompat.C_Timer
 local C_Map = QuestieCompat.C_Map
 local UnitInParty = QuestieCompat.UnitInParty
 local IsInRaid = QuestieCompat.IsInRaid
+-- UnitName is native WoW API, no compat needed
 
 local HBD = QuestieCompat.HBD or LibStub("HereBeDragonsQuestie-2.0")
 
@@ -179,6 +180,26 @@ function QuestieComms:Initialize()
     -- Responds to the "hi" event from others.
     Questie:RegisterMessage("QC_ID_REQUEST_FULL_QUESTLIST", _QuestieComms.RequestQuestLog);
 
+    -- Ensure party members are enabled for communication
+    C_Timer.NewTicker(5, function()
+        if UnitInParty("player") then
+            for i = 1, 4 do
+                local name = UnitName("party" .. i)
+                if name and name ~= "" then
+                    QuestieComms.remotePlayerEnabled[name] = true
+                end
+            end
+        end
+        if IsInRaid() then
+            for i = 1, 40 do
+                local name = UnitName("raid" .. i)
+                if name and name ~= "" and name ~= UnitName("player") then
+                    QuestieComms.remotePlayerEnabled[name] = true
+                end
+            end
+        end
+    end)
+
     -- Part of yellcomms, removing
     -- if not Questie.db.profile.disableYellComms then
     --     C_Timer.NewTicker(60, QuestieComms.SortRemotePlayers) -- periodically check for old players and remove them.
@@ -197,12 +218,14 @@ function _QuestieComms:BroadcastQuestUpdate(questId) -- broadcast quest update t
             if partyType ~= "raid" then
                 QuestieComms:YellProgress(questId)
             end
-            --Do we really need to make this?
-            local questPacket = _QuestieComms:CreatePacket(_QuestieComms.QC_ID_BROADCAST_QUEST_UPDATE)
+            -- EpogQuestie: Use V2 packet with class info for proper tooltip display
+            local questPacket = _QuestieComms:CreatePacket(_QuestieComms.QC_ID_BROADCAST_QUEST_UPDATEV2)
 
-            local quest = QuestieComms:CreateQuestDataPacket(questId);
+            -- Create V2 quest data with class information
+            local questDataV2 = {}
+            QuestieComms:PopulateQuestDataPacketV2(questId, questDataV2, 1)
 
-            questPacket.data.quest = quest
+            questPacket.data.quest = questDataV2
             questPacket.data.priority = "NORMAL";
             if partyType == "raid" then
                 questPacket.data.writeMode = _QuestieComms.QC_WRITE_ALLRAID
@@ -697,7 +720,8 @@ function _QuestieComms:BroadcastQuestLogV2(eventName, sendMode, targetPlayer) --
             --print("[CommsSendOrder][Block " .. (blockCount - 1) .. "] " .. QuestieDB.QueryQuestSingle(entry.questId, "name"))
             entryCount = entryCount + 1
 
-            offset = QuestieComms:PopulateQuestDataPacketV2_noclass_renameme(entry.questId, rawQuestList, offset)
+            -- EpogQuestie: Use V2 with class info for proper tooltip display
+            offset = QuestieComms:PopulateQuestDataPacketV2(entry.questId, rawQuestList, offset)
 
             if string.len(QuestieSerializer:Serialize(rawQuestList)) > 200 then--extra space for packet metadata and CTL stuff
                 rawQuestList[1] = entryCount
@@ -841,6 +865,15 @@ function QuestieComms:InsertQuestDataPacket(questPacket, playerName)
             end
             QuestieComms.remoteQuestLogs[questPacket.id][playerName] = objectives;
 
+            -- Store remote player class for tooltip coloring
+            if not QuestieComms.remotePlayerClasses[playerName] then
+                -- If class info isn't available in packet, try to get it from party members
+                local playerInfo = QuestiePlayer:GetPartyMemberByName(playerName)
+                if playerInfo and playerInfo.class then
+                    QuestieComms.remotePlayerClasses[playerName] = playerInfo.class
+                end
+            end
+
             --Write to tooltip data
             QuestieComms.data:RegisterTooltip(questPacket.id, playerName, objectives);
         end
@@ -924,12 +957,8 @@ _QuestieComms.packets = {
             --    QuestieComms:BroadcastQuestLogV2(self.playerName, "WHISPER") -- player doesnt have new questie, use old packet
             --end
             if UnitName("Player") ~= self.playerName then
-                local major, _, _ = strsplit(".", self.ver)
-                if tonumber(major) > 5 then
-                    _QuestieComms:BroadcastQuestLogV2("QC_ID_BROADCAST_FULL_QUESTLIST", "WHISPER", self.playerName)
-                else
-                    _QuestieComms:BroadcastQuestLog("QC_ID_BROADCAST_FULL_QUESTLIST", "WHISPER", self.playerName)
-                end
+                -- EpogQuestie: Always use V2 since we're based on Questie v9 baseline
+                _QuestieComms:BroadcastQuestLogV2("QC_ID_BROADCAST_FULL_QUESTLIST", "WHISPER", self.playerName)
             end
         end
     },
@@ -943,7 +972,8 @@ _QuestieComms.packets = {
             local offset = 2
             local count = self[1][1]
             for _= 1, count do
-                offset = QuestieComms:InsertQuestDataPacketV2_noclass_RenameMe(self[1], self.playerName, offset, false)
+                -- EpogQuestie: Use V2 with class info for proper tooltip display
+                offset = QuestieComms:InsertQuestDataPacketV2(self[1], self.playerName, offset, false)
             end
         end
     },
@@ -970,7 +1000,8 @@ _QuestieComms.packets = {
         end,
         read = function(self)
             Questie:Debug(Questie.DEBUG_INFO, "[QuestieComms] Received: QC_ID_BROADCAST_QUEST_UPDATEV2")
-            QuestieComms:InsertQuestDataPacketV2_noclass_RenameMe(self[1], self.playerName, 1, false)
+            -- EpogQuestie: Use V2 with class info for proper tooltip display
+            QuestieComms:InsertQuestDataPacketV2(self[1], self.playerName, 1, false)
         end
     }
 }

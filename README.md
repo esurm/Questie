@@ -1,26 +1,16 @@
 # Questie for Project Epoch
 
-A comprehensive quest helper addon for World of Warcraft 3.3.5a (WotLK) specifically adapted for Project Epoch's custom content and modifications.
+A comprehensive quest helper addon for World of Warcraft 3.3.5a client specifically adapted for Project Epoch's custom content and modifications.
 
-## ✨ Features
+## Changelog
 
-- **Quest Tracking**: Visual quest tracking with objectives and progress
-- **Map Integration**: Quest locations displayed on world map and minimap
-- **Custom Content Support**: Full compatibility with Project Epoch's custom quests and NPCs
-- **Custom Quest Database**: Includes hundreds of Epoch-specific quests
-- **Dynamic Quest System**: Automatic tracking for new Epoch quests not yet in the database
-- **Vanilla World Map**: Uses classic world layout instead of WotLK for better Epoch compatibility
-- **Performance Optimized**: Improved stability and memory usage
+https://github.com/esurm/Questie/blob/master/CHANGELOG.md
 
-## 🚀 Version 1.3.0 Changes
+## Known Issues
 
-- **A LOT of bugfixes** to improve stability, performance and memory
-- **Full compatibility** with 3.3.5a client + Epoch customizations
-- **Added over 500+ custom Epoch quests** to database
-- **Changed NPC database** to properly show Epoch custom content
-- **Created dynamic quest tracking** for Epoch quests that are not yet in database (Only quest tracking, no direction info!)
-- **Fixed World Map and Tracking** to use Vanilla world instead of WoTLK
-- **And a lot of misc. changes** related to backporting...
+- Magnify addon not yet supported
+- Epoch quest DB incomplete
+- Leatrix Minimap will cause huge FPS drop (Leatrix issue, can't be fixed)
 
 ## 📥 Installation
 
@@ -51,16 +41,7 @@ If you enjoy this addon and want to support the burnt out slave...I mean dev:
 
 Your support helps keep this project alive and updated!
 
-## 🤝 Contributing
-
-This is a solo dev (sadly) project adapted specifically for Project Epoch. Feel free to:
-
-- Report bugs and issues
-- Suggest improvements
-- Contribute quest data
-- Help with testing
-
-## 📞 Support
+## 📞 Problems?
 
 - **Discord**: Join the Project Epoch Discord for support and discussions
 - **GitHub Issues**: Report bugs and feature requests [here](https://github.com/esurm/Questie/issues)

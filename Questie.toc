@@ -2,7 +2,7 @@
 ## Title: Questie|cFF00FF00 Project Epoch|r
 ## Author: surm (based on Questie)
 ## Notes: Quest helper for Project Epoch (WotLK client)
-## Version: 1.3.3
+## Version: 1.3.4
 ## RequiredDeps:
 ## OptionalDeps: Ace3, CallbackHandler-1.0, HereBeDragons, LibDataBroker-1.1, LibDBIcon-1.0, LibSharedMedia-3.0, LibStub, LibUIDropDownMenu
 ## SavedVariables: QuestieConfig
@@ -69,6 +69,11 @@ Database\Corrections\classicQuestFixes.lua
 Database\Corrections\classicNPCFixes.lua
 Database\Corrections\classicItemFixes.lua
 Database\Corrections\classicObjectFixes.lua
+
+# Epoch Corrections
+Database\Corrections\epochStormwindFixes.lua
+Database\Corrections\epochStormwindObjectFixes.lua
+Database\Corrections\epochElwynnFixes.lua
 
 # Compiler
 Database\compiler.lua

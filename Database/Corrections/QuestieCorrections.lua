@@ -28,6 +28,12 @@ local QuestieQuestFixes = QuestieLoader:ImportModule("QuestieQuestFixes")
 local QuestieClassicQuestReputationFixes = QuestieLoader:ImportModule("QuestieClassicQuestReputationFixes")
 ---@type QuestieNPCFixes
 local QuestieNPCFixes = QuestieLoader:ImportModule("QuestieNPCFixes")
+---@type QuestieEpochStormwindFixes
+local QuestieEpochStormwindFixes = QuestieLoader:ImportModule("QuestieEpochStormwindFixes")
+---@type QuestieEpochStormwindObjectFixes
+local QuestieEpochStormwindObjectFixes = QuestieLoader:ImportModule("QuestieEpochStormwindObjectFixes")
+---@type QuestieEpochElwynnFixes
+local QuestieEpochElwynnFixes = QuestieLoader:ImportModule("QuestieEpochElwynnFixes")
 ---@type QuestieItemFixes
 local QuestieItemFixes = QuestieLoader:ImportModule("QuestieItemFixes")
 ---@type QuestieObjectFixes
@@ -320,8 +326,14 @@ function QuestieCorrections:Initialize(validationTables)
     _LoadCorrections("questData", QuestieClassicQuestReputationFixes:Load(), QuestieDB.questKeysReversed, validationTables)
     _LoadCorrections("questData", QuestieQuestFixes:Load(), QuestieDB.questKeysReversed, validationTables)
     _LoadCorrections("npcData", QuestieNPCFixes:Load(), QuestieDB.npcKeysReversed, validationTables)
+    -- Epoch-specific Stormwind fixes for WotLK coordinates
+    _LoadCorrections("npcData", QuestieEpochStormwindFixes:Load(), QuestieDB.npcKeysReversed, validationTables)
+    -- Epoch-specific Elwynn Forest fixes for WotLK coordinates
+    _LoadCorrections("npcData", QuestieEpochElwynnFixes:Load(), QuestieDB.npcKeysReversed, validationTables)
     _LoadCorrections("itemData", QuestieItemFixes:Load(), QuestieDB.itemKeysReversed, validationTables)
     _LoadCorrections("objectData", QuestieObjectFixes:Load(), QuestieDB.objectKeysReversed, validationTables)
+    -- Epoch-specific Stormwind object fixes for WotLK coordinates
+    _LoadCorrections("objectData", QuestieEpochStormwindObjectFixes:Load(), QuestieDB.objectKeysReversed, validationTables)
 
     if Questie.IsTBC or Questie.IsWotlk then
         if QuestieTBCQuestFixes and QuestieTBCQuestFixes.Load then

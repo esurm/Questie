@@ -97,8 +97,8 @@ local function _CreateRuntimeQuestStub(questId, questLogData)
                 -- Debug logging for title retrieval
                 Questie:Debug(Questie.DEBUG_INFO, "[_CreateRuntimeQuestStub] Quest", questId, "Blizzard API title:", t, "level:", level, "questTag:", questTag, "final title:", title)
                 
-                -- Use 3.3.5a API first since we're on 3.3.5a client
-                if (not rawObjectives) and SelectQuestLogEntry and GetNumQuestLeaderBoards and GetQuestLogLeaderBoard then
+                -- Always try to get fresh objectives from quest log API for consistency
+                if SelectQuestLogEntry and GetNumQuestLeaderBoards and GetQuestLogLeaderBoard then
                     SelectQuestLogEntry(qli)
                     local numObjectives = GetNumQuestLeaderBoards()
                     if numObjectives and numObjectives > 0 then
@@ -115,7 +115,7 @@ local function _CreateRuntimeQuestStub(questId, questLogData)
                             end
                         end
                         if #objectives > 0 then
-                            rawObjectives = objectives
+                            rawObjectives = objectives  -- Use fresh API data for consistency
                             Questie:Debug(Questie.DEBUG_INFO, "[_CreateRuntimeQuestStub] Retrieved", #objectives, "objectives from 3.3.5a API for quest", questId)
                         end
                     end
@@ -126,18 +126,18 @@ local function _CreateRuntimeQuestStub(questId, questLogData)
         end
     end
 
-    -- Get current zone name for runtime stub using only GetSubZoneText
+    -- Get current zone name for runtime stub using GetZoneText
     local currentZoneName = nil
     Questie:Debug(Questie.DEBUG_INFO, "[_CreateRuntimeQuestStub] Getting zone info for quest", questId)
     
-    -- Use only GetSubZoneText as requested - this provides the most specific location
-    if GetSubZoneText then
-        currentZoneName = GetSubZoneText()
+    -- Use GetZoneText to get the main zone name rather than subzone
+    if GetZoneText then
+        currentZoneName = GetZoneText()
         if currentZoneName and currentZoneName ~= "" then
-            Questie:Debug(Questie.DEBUG_INFO, "[_CreateRuntimeQuestStub] GetSubZoneText() returned:", currentZoneName)
+            Questie:Debug(Questie.DEBUG_INFO, "[_CreateRuntimeQuestStub] GetZoneText() returned:", currentZoneName)
         else
             currentZoneName = nil
-            Questie:Debug(Questie.DEBUG_INFO, "[_CreateRuntimeQuestStub] GetSubZoneText() returned empty or nil")
+            Questie:Debug(Questie.DEBUG_INFO, "[_CreateRuntimeQuestStub] GetZoneText() returned empty or nil")
         end
     end
     
@@ -190,20 +190,13 @@ local function _CreateRuntimeQuestStub(questId, questLogData)
             local numRequired = obj.numRequired or 0
             local finished = obj.finished or false
             
-            -- Format description with progress counter if needed
-            local formattedDesc = desc
-            if numRequired and tonumber(numRequired) > 1 and not string.find(desc, "%d+/%d+") then
-                -- Add progress formatting if not already present and it's a countable objective
-                formattedDesc = desc:gsub(":?%s*$", "") .. ": " .. numFulfilled .. "/" .. numRequired
-            end
-            
-            Questie:Debug(Questie.DEBUG_INFO, "[_CreateRuntimeQuestStub] Objective", i, "desc:", desc, "formatted:", formattedDesc, "fulfilled:", numFulfilled, "required:", numRequired, "finished:", finished)
+            Questie:Debug(Questie.DEBUG_INFO, "[_CreateRuntimeQuestStub] Objective", i, "desc:", desc, "fulfilled:", numFulfilled, "required:", numRequired, "finished:", finished)
             stub.Objectives[i] = {
                 Id = nil,
                 Index = i,
                 questId = questId,
                 _lastUpdate = 0,
-                Description = formattedDesc,
+                Description = desc,
                 spawnList = {},
                 AlreadySpawned = {},
                 -- Mark as pre-updated to avoid ObjectiveUpdate relying on QuestLogCache immediately
@@ -265,29 +258,12 @@ local function _UpdateRuntimeQuestStub(questId, stub)
             for i = 1, numObjectives do
                 local description, type, finished, numFulfilled, numRequired = GetQuestLogLeaderBoard(i)
                 if description then
-                    -- Parse the description to extract base text and progress info
-                    local baseDesc = description
-                    local hasProgress = false
-                    
-                    -- Check if description already contains progress formatting
-                    if string.find(description, "%d+/%d+") then
-                        hasProgress = true
-                    elseif numFulfilled and numRequired and tonumber(numRequired) > 0 then
-                        -- If no progress in description but we have valid numbers, add progress formatting
-                        -- Remove any trailing colon and add progress counter
-                        baseDesc = description:gsub(":?%s*$", "")
-                        if tonumber(numRequired) > 1 then
-                            baseDesc = baseDesc .. ": " .. (numFulfilled or 0) .. "/" .. numRequired
-                        end
-                        hasProgress = true
-                    end
-                    
                     newObjectives[i] = {
                         Id = nil,
                         Index = i,
                         questId = questId,
                         _lastUpdate = 0,
-                        Description = baseDesc,
+                        Description = description,
                         spawnList = {},
                         AlreadySpawned = {},
                         isUpdated = true,
@@ -303,7 +279,7 @@ local function _UpdateRuntimeQuestStub(questId, stub)
                     newObjectives[i].isUpdated = false
                     newObjectives[i]:Update()
                     
-                    Questie:Debug(Questie.DEBUG_INFO, "[_UpdateRuntimeQuestStub] Objective", i, "raw desc:", description, "formatted desc:", baseDesc, "progress:", numFulfilled, "/", numRequired)
+                    Questie:Debug(Questie.DEBUG_INFO, "[_UpdateRuntimeQuestStub] Objective", i, "desc:", description, "progress:", numFulfilled, "/", numRequired)
                 end
             end
         end
@@ -321,15 +297,37 @@ end
 -- Function to update all runtime stubs
 function QuestieQuest:UpdateRuntimeStubs()
     local updated = 0
+    local removed = 0
+    local toRemove = {}
+    
     for questId, quest in pairs(QuestiePlayer.currentQuestlog) do
         if quest.__isRuntimeStub then
             if _UpdateRuntimeQuestStub(questId, quest) then
                 updated = updated + 1
+            else
+                -- Runtime stub update failed, likely because quest is no longer in quest log
+                -- Mark it for removal
+                toRemove[questId] = true
             end
         end
     end
-    if updated > 0 then
-        Questie:Debug(Questie.DEBUG_INFO, "[QuestieQuest:UpdateRuntimeStubs] Updated", updated, "runtime stubs")
+    
+    -- Remove runtime stubs that are no longer in the quest log
+    for questId in pairs(toRemove) do
+        Questie:Debug(Questie.DEBUG_INFO, "[QuestieQuest:UpdateRuntimeStubs] Removing abandoned runtime stub:", questId)
+        QuestiePlayer.currentQuestlog[questId] = nil
+        QuestieTracker:RemoveQuest(questId)
+        removed = removed + 1
+    end
+    
+    if updated > 0 or removed > 0 then
+        Questie:Debug(Questie.DEBUG_INFO, "[QuestieQuest:UpdateRuntimeStubs] Updated", updated, "runtime stubs, removed", removed, "abandoned stubs")
+        -- Update tracker if we made changes
+        if removed > 0 then
+            QuestieCombatQueue:Queue(function()
+                QuestieTracker:Update()
+            end)
+        end
     end
 end
 
@@ -817,6 +815,7 @@ function QuestieQuest:AbandonedQuest(questId)
 
         AvailableQuests.UnloadUndoable()
 
+        -- Always clean up tracker and tooltips, regardless of whether it's a database quest or stub quest
         QuestieTracker:RemoveQuest(questId)
         QuestieTooltips:RemoveQuest(questId)
         QuestieCombatQueue:Queue(function()
@@ -948,18 +947,6 @@ function QuestieQuest:GetAllQuestIds()
             -- Create a runtime stub so the tracker can still show and update progress for unknown/custom quests.
             local stub = _CreateRuntimeQuestStub(questId, data)
             QuestiePlayer.currentQuestlog[questId] = stub
-            -- Ensure stubs are visible in the tracker regardless of tracking settings
-            if Questie.db and Questie.db.char then
-                -- Remove any auto-untracked flag
-                if Questie.db.char.AutoUntrackedQuests then
-                    Questie.db.char.AutoUntrackedQuests[questId] = nil
-                end
-                -- If auto tracking is disabled, explicitly mark this quest as tracked
-                if Questie.db.profile and (not Questie.db.profile.autoTrackQuests) then
-                    Questie.db.char.TrackedQuests = Questie.db.char.TrackedQuests or {}
-                    Questie.db.char.TrackedQuests[questId] = true
-                end
-            end
             Questie:Debug(Questie.DEBUG_INFO, "[QuestieQuest] Added runtime stub for missing DB quest", questId)
         else
             --Keep the object in the questlog to save searching
@@ -1125,16 +1112,6 @@ function QuestieQuest:GetAllQuestIdsNoObjectives()
             -- Insert a light-weight runtime stub here as well so resets keep the tracker populated.
             local stub = _CreateRuntimeQuestStub(questId, data)
             QuestiePlayer.currentQuestlog[questId] = stub
-            -- Ensure stubs are visible in the tracker regardless of tracking settings
-            if Questie.db and Questie.db.char then
-                if Questie.db.char.AutoUntrackedQuests then
-                    Questie.db.char.AutoUntrackedQuests[questId] = nil
-                end
-                if Questie.db.profile and (not Questie.db.profile.autoTrackQuests) then
-                    Questie.db.char.TrackedQuests = Questie.db.char.TrackedQuests or {}
-                    Questie.db.char.TrackedQuests[questId] = true
-                end
-            end
             Questie:Debug(Questie.DEBUG_INFO, "[QuestieQuest] Added runtime stub (no objectives path) for missing DB quest", questId)
         else
             --Keep the object in the questlog to save searching

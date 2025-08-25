@@ -63,6 +63,7 @@ function QuestieSlash.HandleCommands(input)
         print(Questie:Colorize("/questie flex - " .. l10n("Flex the amount of quests you have completed so far"), "yellow"));
         print(Questie:Colorize("/questie doable [questID] - " .. l10n("Prints whether you are eligibile to do a quest"), "yellow"));
         print(Questie:Colorize("/questie version - " .. l10n("Prints Questie and client version info"), "yellow"));
+        print(Questie:Colorize("/questie version check - " .. l10n("Compare EpogQuestie versions with all server users"), "yellow"));
         return;
     end
 
@@ -159,6 +160,7 @@ function QuestieSlash.HandleCommands(input)
     end
 
     if mainCommand == "version" then
+        -- Simple version display
         local gameType = ""
         if Questie.IsWotlk then
             gameType = "Wrath"
@@ -169,6 +171,7 @@ function QuestieSlash.HandleCommands(input)
         end
 
         Questie:Print("Questie " .. QuestieLib:GetAddonVersionString() .. ", Client " .. GetBuildInfo() .. " " .. gameType .. ", Locale " .. GetLocale())
+        print("|cFFFFFF00[EpogQuestie]|r Check for updates at Github: https://github.com/esurm/Questie")
         return
     end
 

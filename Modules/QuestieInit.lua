@@ -462,10 +462,15 @@ function QuestieInit:Init()
         print("Questie Epoch: Core not initialized; aborting init this tick")
         return
     end
-    -- EpogQuestie: Debug init start
-    print("|cFF00FF00[EpogQuestie]|r Github: https://github.com/esurm/Questie")
+    -- EpogQuestie: Clean startup message
+    local currentVersion = GetAddOnMetadata("Questie", "Version") or
+                          GetAddOnMetadata("EpogQuestie", "Version") or "Unknown"
+    print("|cFF00FF00[EpogQuestie]|r Version " .. currentVersion ..
+          " | Check for updates at Github: https://github.com/esurm/Questie")
     
-    ThreadLib.ThreadError(_QuestieInit.StartStageCoroutine, Questie.db.profile.initDelay or 0, l10n("Error during initialization!"))
+    ThreadLib.ThreadError(_QuestieInit.StartStageCoroutine,
+                          Questie.db.profile.initDelay or 0,
+                          l10n("Error during initialization!"))
 
     if Questie.db.profile.trackerEnabled then
         -- This needs to be called ASAP otherwise tracked Achievements in the Blizzard WatchFrame shows upon login

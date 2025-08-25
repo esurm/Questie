@@ -7,6 +7,17 @@ local QuestLogCache = QuestieLoader:CreateModule("QuestLogCache")
 local QuestieLib = QuestieLoader:ImportModule("QuestieLib")
 ---@type Sounds
 local Sounds = QuestieLoader:ImportModule("Sounds")
+---@type QuestiePlayer
+local QuestiePlayer = QuestieLoader:ImportModule("QuestiePlayer")
+---@type QuestieTracker
+local QuestieTracker = QuestieLoader:ImportModule("QuestieTracker")
+---@type QuestieTooltips
+local QuestieTooltips = QuestieLoader:ImportModule("QuestieTooltips")
+---@type QuestieMap
+local QuestieMap = QuestieLoader:ImportModule("QuestieMap")
+
+-- Global Questie reference
+local Questie = _G.Questie
 
 --- COMPATIBILITY ---
 local GetQuestLogTitle = QuestieCompat.GetQuestLogTitle
@@ -230,12 +241,34 @@ function QuestLogCache.CheckForChanges(questIdsToCheck)
         end
     end
 
-    -- debug / error detection to see if this happens sometimes. If happens there is fault in QuestEventHandler side.
+    -- Handle runtime stub quests that are no longer in the game's quest log (untracked)
     if questIdsToCheck then
         for questId in pairs(questIdsToCheck) do
             if (not questIdsChecked[questId]) then
-                -- TODO: This actually happens and need to be fixed
-                Questie:Warning("Please report on Github or Discord. QuestId doesn't exist in Game's quest log:", questId)
+                -- Check if this is a runtime stub quest that was untracked
+                local quest = QuestiePlayer.currentQuestlog[questId]
+                if quest and quest.__isRuntimeStub then
+                    Questie:Debug(Questie.DEBUG_INFO, "[QuestLogCache] Runtime stub quest", questId, 
+                        "no longer in game quest log, cleaning up")
+                    
+                    -- Remove from quest log
+                    QuestiePlayer.currentQuestlog[questId] = nil
+                    
+                    -- Remove from cache
+                    cache[questId] = nil
+                    
+                    -- Clean up UI elements
+                    QuestieTracker:RemoveQuest(questId)
+                    QuestieTooltips:RemoveQuest(questId)
+                    QuestieMap:UnloadQuestFrames(questId)
+                    
+                    Questie:Debug(Questie.DEBUG_INFO, "[QuestLogCache] Successfully cleaned up " ..
+                        "untracked runtime stub quest", questId)
+                else
+                    -- For non-runtime stub quests, keep the existing warning
+                    Questie:Warning("Please report on Github or Discord. QuestId doesn't exist " ..
+                        "in Game's quest log:", questId)
+                end
             end
         end
     end
