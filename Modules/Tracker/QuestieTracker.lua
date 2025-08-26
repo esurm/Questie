@@ -2119,43 +2119,10 @@ function QuestieTracker:AQW_Insert(index, expire)
     RemoveQuestWatch(index, true)
 
     local questId = select(8, GetQuestLogTitle(index))
-    if questId == 0 or questId == nil then
+    if questId == 0 then
         -- When an objective progresses in TBC "index" is the questId, but when a quest is manually added to the quest watch
         -- (e.g. shift clicking it in the quest log) "index" is the questLogIndex.
-        -- Try to get questId from questLogIndex properly
-        if GetQuestLogIndexByID then
-            -- If index is a questId, this will return the questLogIndex
-            local qli = GetQuestLogIndexByID(index)
-            if qli and qli > 0 then
-                -- index was actually a questId
-                questId = index
-            else
-                -- index is a questLogIndex, need to extract questId from it
-                -- Loop through quest log to find the matching index
-                local numEntries = GetNumQuestLogEntries()
-                local currentIndex = 0
-                for i = 1, numEntries do
-                    local _, _, _, isHeader = GetQuestLogTitle(i)
-                    if not isHeader then
-                        currentIndex = currentIndex + 1
-                        if currentIndex == index then
-                            local extractedQuestId = select(8, GetQuestLogTitle(i))
-                            if extractedQuestId and extractedQuestId > 0 then
-                                questId = extractedQuestId
-                            end
-                            break
-                        end
-                    end
-                end
-                
-                -- If still no questId found, fallback to index
-                if questId == 0 or questId == nil then
-                    questId = index
-                end
-            end
-        else
-            questId = index
-        end
+        questId = index
     end
 
     if questId > 0 then
