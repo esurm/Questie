@@ -183,6 +183,8 @@ function QuestieOptionsDefaults:Load()
             debugEnabledPrint = false,
             debugLevel = 0,
             skipValidation = false,
+            enableDataCollection = false, -- Developer feature for capturing missing quest data
+            dataCollectionPrompted = nil, -- nil = not prompted, true = prompted
         },
         char = {
             complete = {},

@@ -83,8 +83,11 @@ local QuestLogFrame = QuestLogExFrame or ClassicQuestLog or QuestLogFrame
 function QuestieTracker.Initialize()
     if QuestieTracker.started then
         -- The Tracker was already initialized, so we don't need to do it again.
+        Questie:Debug(Questie.DEBUG_CRITICAL, "[QuestieTracker] Already initialized, skipping")
         return
     end
+    
+    Questie:Debug(Questie.DEBUG_CRITICAL, "[QuestieTracker] Starting initialization")
 
     -- These values might also be accessed by other modules, so we need to make sure they exist. Even when the Tracker is disabled
     if (not Questie.db.char.TrackerHiddenQuests) then
@@ -123,8 +126,11 @@ function QuestieTracker.Initialize()
 
     if (not Questie.db.profile.trackerEnabled) then
         -- The Tracker is disabled, no need to continue
+        Questie:Debug(Questie.DEBUG_CRITICAL, "[QuestieTracker] Tracker disabled in profile, not initializing")
         return
     end
+    
+    Questie:Debug(Questie.DEBUG_CRITICAL, "[QuestieTracker] Tracker enabled, continuing initialization")
 
     -- Initialize tracker frames
     trackerBaseFrame = TrackerBaseFrame.Initialize()
@@ -135,6 +141,8 @@ function QuestieTracker.Initialize()
     TrackerLinePool.Initialize(trackerQuestFrame)
     TrackerFadeTicker.Initialize(trackerBaseFrame, trackerHeaderFrame)
     QuestieTracker.started = true
+    
+    Questie:Debug(Questie.DEBUG_CRITICAL, "[QuestieTracker] Initialization complete, tracker started")
 
     -- Initialize hooks
     QuestieTracker:HookBaseTracker()

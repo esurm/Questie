@@ -414,6 +414,48 @@ function QuestieOptions.tabs.advanced:Initialize()
                     end
                 end,
             },
+            spacer_datacollector = QuestieOptionsUtils:Spacer(6),
+            header_datacollector = {
+                type = "header",
+                order = 6.01,
+                name = function() return "Developer Tools"; end,
+            },
+            enableDataCollection = {
+                type = "toggle",
+                order = 6.02,
+                name = function() return "Enable Quest Data Collection"; end,
+                desc = function() return "When enabled, automatically captures quest data for missing Epoch quests. |cFFFF0000DEVELOPER FEATURE ONLY|r\n\nThis will alert you when accepting quests not in the database and capture NPC IDs, coordinates, and objectives."; end,
+                descStyle = "inline",
+                width = "full",
+                get = function() return Questie.db.profile.enableDataCollection; end,
+                set = function(_, value)
+                    Questie.db.profile.enableDataCollection = value
+                    if value then
+                        -- Initialize the data collector
+                        if QuestieDataCollector and QuestieDataCollector.Initialize then
+                            QuestieDataCollector:Initialize()
+                        end
+                        -- Enable tooltip IDs for data collection
+                        if QuestieDataCollector and QuestieDataCollector.EnableTooltipIDs then
+                            QuestieDataCollector:EnableTooltipIDs()
+                        end
+                        DEFAULT_CHAT_FRAME:AddMessage("|cFFFF0000[Questie] Quest Data Collection ENABLED - Developer mode active|r", 1, 0, 0)
+                        DEFAULT_CHAT_FRAME:AddMessage("|cFFFFFF00[Questie] Tooltip IDs have been enabled to assist with data collection|r", 1, 1, 0)
+                    else
+                        -- Restore original tooltip settings
+                        if QuestieDataCollector and QuestieDataCollector.RestoreTooltipIDs then
+                            QuestieDataCollector:RestoreTooltipIDs()
+                        end
+                        DEFAULT_CHAT_FRAME:AddMessage("|cFF00FF00[Questie] Quest Data Collection disabled|r", 0, 1, 0)
+                    end
+                end,
+            },
+            dataCollectionInfo = {
+                type = "description",
+                order = 6.03,
+                name = function() return "|cFFFFFF00Commands when enabled:|r\n/qdc show - Show tracked quests\n/qdc export <id> - Export quest data\n/qdc clear - Clear collected data\n\n|cFFFF0000Warning:|r This feature tracks all quest interactions and saves data to SavedVariables."; end,
+                fontSize = "medium",
+            },
         },
     }
 end

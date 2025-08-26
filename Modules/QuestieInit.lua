@@ -18,6 +18,8 @@ local Migration = QuestieLoader:ImportModule("Migration")
 local QuestieProfessions = QuestieLoader:ImportModule("QuestieProfessions")
 ---@type QuestieTracker
 local QuestieTracker = QuestieLoader:ImportModule("QuestieTracker")
+---@type QuestieDataCollector
+local QuestieDataCollector = QuestieLoader:ImportModule("QuestieDataCollector")
 ---@type QuestieMap
 local QuestieMap = QuestieLoader:ImportModule("QuestieMap")
 ---@type QuestieLib
@@ -321,6 +323,28 @@ QuestieInit.Stages[3] = function() -- run as a coroutine
     QuestieQuest:GetAllQuestIds()
     Hooks:HookQuestLogTitle()
     QuestieCombatQueue.Initialize()
+    
+    -- Initialize Data Collector if enabled or prompt user
+    coYield()
+    if QuestieDataCollector then
+        Questie:Debug(Questie.DEBUG_CRITICAL, "[QuestieInit] QuestieDataCollector module found")
+        Questie:Debug(Questie.DEBUG_CRITICAL, "[QuestieInit] dataCollectionPrompted = " .. tostring(Questie.db.profile.dataCollectionPrompted))
+        Questie:Debug(Questie.DEBUG_CRITICAL, "[QuestieInit] enableDataCollection = " .. tostring(Questie.db.profile.enableDataCollection))
+        
+        -- Check if this is first run for community contribution
+        if Questie.db.profile.dataCollectionPrompted == nil then
+            C_Timer.After(5, function()
+                QuestieDataCollector:ShowContributionPopup()
+            end)
+        elseif Questie.db.profile.enableDataCollection then
+            Questie:Debug(Questie.DEBUG_CRITICAL, "[QuestieInit] Calling QuestieDataCollector:Initialize()")
+            QuestieDataCollector:Initialize()
+        else
+            Questie:Debug(Questie.DEBUG_CRITICAL, "[QuestieInit] Data collection not enabled, skipping initialization")
+        end
+    else
+        Questie:Debug(Questie.DEBUG_CRITICAL, "[QuestieInit] QuestieDataCollector module not found!")
+    end
 
     local dateToday = date("%y-%m-%d")
 
