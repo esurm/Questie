@@ -242,6 +242,7 @@ local epochQuestData = {
 [26921] = {"Skins of the Swamp",{{45885}},{{45885}},nil,40,nil,nil,{"Collect Sturdy Crocolisk Skins from Sawtooth Snapper and Rugged Panther Skin from Shadow Panther."},nil,{nil,nil,{{61028,nil},{61029,nil}}},nil,nil,{26920},nil,nil,nil,8,nil,nil,nil,nil,nil,8,0,nil,nil,nil,nil,nil,nil},
 [26923] = {"Wanted: Spinnaret",{nil,{4000053}},{{45878}},nil,38,77,nil,{"Locate Spinnaret East of the Harborage and eradicate them."},nil,{nil,nil,{{61039,nil}}},nil,nil,nil,nil,nil,nil,8,nil,nil,nil,nil,nil,8,0,nil,nil,nil,nil,nil,nil},
 [26924] = {"[Epoch] Quest 26924",{nil,{4001025}},nil,nil,40,nil,nil,nil,nil,{nil,nil,{{61047,nil}}},nil,nil,nil,nil,nil,nil,8,nil,nil,nil,nil,nil,8,0,nil,nil,nil,nil,nil,nil},
+[26925] = {"Message for the Historian",{{45886}},{{45887}},nil,8,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,85,nil,nil,nil,nil,nil,nil,0,nil,nil,nil,nil,nil,nil},
 [26928] = {"[Epoch] Quest 26928",{{45139}},{{45139}},nil,11,nil,nil,nil,nil,{nil,nil,{{60163,nil}}},nil,nil,nil,{26929},nil,nil,130,nil,nil,nil,nil,26929,8,0,nil,nil,nil,nil,nil,nil},
 [26929] = {"[Epoch] Quest 26929",{{45139}},{{45139}},nil,11,nil,nil,nil,nil,{nil,nil,{{60164,nil},{60165,nil}}},nil,nil,{26928},{26930},nil,nil,130,nil,nil,nil,nil,26930,8,0,26928,nil,nil,nil,nil,nil},
 [26930] = {"[Epoch] Quest 26930",{{45139}},{{45141}},nil,11,nil,nil,nil,nil,nil,nil,nil,{26929},{26931},nil,nil,130,nil,nil,nil,nil,26931,nil,0,26929,nil,nil,nil,nil,nil},
