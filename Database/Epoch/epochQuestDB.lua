@@ -13,6 +13,7 @@ local epochQuestData = {
 [991] = {"Raene's Cleansing",{{3691}},nil,18,19,77,nil,{"Find Teronis in Ashenvale."},nil,nil,nil,nil,nil,nil,nil,nil,331,nil,nil,nil,nil,nil,nil,0,nil,nil,nil,nil,nil,nil},
 [1302] = {"[Epoch] Quest 1302",{{5082}},nil,30,35,77,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,11,nil,nil,nil,nil,nil,nil,0,nil,nil,nil,nil,nil,nil},
 [2038] = {"Bingles' Missing Supplies",{{6577}},{{6577}},12,15,77,nil,{"Find and return Bingles' supplies:\n\nBingles' Wrench, Bingles' Screwdriver, Bingles' Hammer, and Bingles' Blastencapper."},nil,{nil,nil,{{7343,nil},{7345,nil},{7346,nil},{7376,nil}}},nil,nil,nil,nil,nil,nil,38,nil,nil,nil,nil,nil,8,0,nil,nil,nil,nil,nil,nil},
+[11158] = {"[Epoch] Bloodfen Feathers",{{23579}},{{23579}},36,39,nil,nil,{"Bring 5 Bloodfen Feathers to Brogg at Brogg's Hollow."},nil,{nil,nil,{{33085,nil,5}}},nil,nil,nil,nil,nil,nil,15,nil,nil,nil,nil,nil,8,0,nil,nil,nil,nil,nil,nil},
 [9469] = {"[Epoch] Quest 9469",{{45683}},{nil,{181649}},42,46,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,47,nil,nil,nil,nil,nil,nil,0,nil,nil,nil,nil,nil,nil},
 [9470] = {"[Epoch] Quest 9470",{{45683}},{{45683}},42,46,nil,nil,nil,nil,{{{17235,nil},{17236,nil}}},nil,nil,nil,nil,nil,nil,47,nil,nil,nil,nil,nil,8,0,nil,nil,nil,nil,nil,nil},
 [9609] = {"[Epoch] Quest 9609",{{45878}},nil,nil,37,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,8,nil,nil,nil,nil,nil,nil,0,nil,nil,nil,nil,nil,nil},
