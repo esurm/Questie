@@ -1960,6 +1960,10 @@ function QuestieTracker:HookBaseTracker()
         if not Questie.db.profile.autoTrackQuests then
             return Questie.db.char.TrackedQuests[questId or -1]
         else
+            -- Ensure AutoUntrackedQuests table exists before accessing it
+            if not Questie.db.char.AutoUntrackedQuests then
+                Questie.db.char.AutoUntrackedQuests = {}
+            end
             return questId and QuestiePlayer.currentQuestlog[questId] and (not Questie.db.char.AutoUntrackedQuests[questId])
         end
     end
@@ -2083,6 +2087,10 @@ function QuestieTracker:UntrackQuestId(questId)
     if not Questie.db.profile.autoTrackQuests then
         Questie.db.char.TrackedQuests[questId] = nil
     else
+        -- Ensure AutoUntrackedQuests table exists before accessing it (fix for initialization error)
+        if not Questie.db.char.AutoUntrackedQuests then
+            Questie.db.char.AutoUntrackedQuests = {}
+        end
         Questie.db.char.AutoUntrackedQuests[questId] = true
     end
 
@@ -2136,6 +2144,11 @@ function QuestieTracker:AQW_Insert(index, expire)
                 Questie.db.char.TrackedQuests[questId] = true
             end
         else
+            -- Ensure AutoUntrackedQuests table exists before accessing it
+            if not Questie.db.char.AutoUntrackedQuests then
+                Questie.db.char.AutoUntrackedQuests = {}
+            end
+            
             if Questie.db.char.AutoUntrackedQuests[questId] then
                 Questie.db.char.AutoUntrackedQuests[questId] = nil
 
