@@ -1063,7 +1063,8 @@ QuestieCompat.KButtons = {
     Add = function(self, templateName, templateType)
         local button = CreateFrame("Button", "Questie_WorldMapButton", WorldMapFrame)
         button:SetHighlightTexture("Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight")
-        button:SetPoint("TOPRIGHT", WorldMapButton, "TOPRIGHT", -4, -2);
+        -- Support WorldMapScrollFrame for Magnify if present
+        button:SetPoint("TOPRIGHT", WorldMapScrollFrame or WorldMapButton, "TOPRIGHT", -4, -2);
         button:SetFrameLevel(99)
         button:SetSize(32, 32)
         button:RegisterForClicks("anyUp")
