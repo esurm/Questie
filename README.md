@@ -17,7 +17,7 @@ https://github.com/esurm/Questie/blob/master/CHANGELOG.md
 
 1. **Download the release** from the [Releases page](https://github.com/esurm/Questie/releases)
 2. **DELETE ANY OLD QUESTIE FOLDERS!**
-3. **Extract** the contents into your `/Interface/AddOns/` folder and rename folder `Questie-l.3.4` to `Questie`
+3. **Extract** the contents into your `/Interface/AddOns/` folder and rename folder `Questie-l.3.5a` to `Questie`
 4. **Restart** WoW Client
 5. **Enjoy** enhanced quest tracking for Project Epoch!
 
