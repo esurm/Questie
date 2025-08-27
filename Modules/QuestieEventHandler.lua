@@ -223,6 +223,9 @@ function QuestieEventHandler:RegisterLateEvents()
             end
         end
     end)
+
+    -- Maintain icon scale when map zoom changes
+    hooksecurefunc(WorldMapDetailFrame, "SetScale", QuestieMap.RescaleIcons)
 end
 
 function _EventHandler:PlayerLogin()
