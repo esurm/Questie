@@ -8,7 +8,6 @@ https://github.com/esurm/Questie/blob/master/CHANGELOG.md
 
 ## Known Issues
 
-- Magnify addon not yet supported
 - Epoch quest DB incomplete
 - Leatrix Minimap will cause huge FPS drop (Leatrix issue, can't be fixed)
 
