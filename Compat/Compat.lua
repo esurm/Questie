@@ -888,7 +888,9 @@ end
 
 -- handle tooltip based on the parent frame
 function QuestieCompat.SetupTooltip(frame, OnHide)
-    if (frame:GetParent() == WorldMapFrame) then
+    -- The parent frame can be "WorldMapFrame" or "WorldMapButton", so check if the parent starts with the WorldMap prefix
+    local worldMapPrefix = "WorldMap"
+    if (frame:GetParent():GetName():sub(0, #worldMapPrefix) == worldMapPrefix) then
         WorldMapPOIFrame.allowBlobTooltip = OnHide and true or false
         QuestieCompat.Tooltip = WorldMapTooltip
     else
