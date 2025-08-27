@@ -207,6 +207,7 @@ function QuestieMap.GetScaleValue()
         elseif (mapInfo.mapType == 2) then -- Continent
             scaling = 0.9
         end
+        scaling = scaling / WorldMapDetailFrame:GetScale()
     end
     return scaling
 end
