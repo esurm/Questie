@@ -24,7 +24,8 @@ function QuestieMap.utils:SetDrawOrder(frame)
         frame:SetFrameStrata(frameStrata)
         frame:SetFrameLevel(frameLevel)
     else
-        local canvas = QuestieCompat.WorldMapFrame.GetCanvas()
+        -- If Magnify present, anchor to the scalable canvas; otherwise anchor to the vanilla WorldMapFrame
+        local canvas = WorldMapScrollFrame and QuestieCompat.WorldMapFrame.GetCanvas() or WorldMapFrame
         local frameLevel = canvas:GetFrameLevel() + 7
         local frameStrata = canvas:GetFrameStrata()
         frame:SetParent(canvas)
