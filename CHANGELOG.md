@@ -1,4 +1,10 @@
 # Questie Changelog
+
+## [1.3.5a] - 2025-08-25
+
+- Bugfixes
+- Magnify support
+
 ## [1.3.4b] - 2025-08-25
 
 - Bugfixes
